@@ -1,24 +1,30 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
-
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
-
 
   // 1) GET /posts
   // 모든 게시물을 조회하는 API
   @Get()
   getPosts() {
     return this.postsService.getAllPosts();
-  } 
+  }
 
   // 2) GET /posts/:id
   // 아이디에 해당되는 특정 게시물을 조회하는 API
   @Get(':id')
   getPost(@Param('id') id: string) {
-   return this.postsService.getPostById(+id);
+    return this.postsService.getPostById(+id);
   }
 
   // 3) POST /posts
@@ -28,10 +34,8 @@ export class PostsController {
     @Body('author') author: string,
     @Body('title') title: string,
     @Body('content') content: string,
-  ){
-   return this.postsService.createPost(
-    author, title, content,
-    );
+  ) {
+    return this.postsService.createPost(author, title, content);
   }
 
   // 4) PATCH /posts/:id
@@ -42,15 +46,14 @@ export class PostsController {
     @Body('author') author?: string,
     @Body('title') title?: string,
     @Body('content') content?: string,
-  ){
-   return this.postsService.updatePost(+id, author, title, content);
+  ) {
+    return this.postsService.updatePost(+id, author, title, content);
   }
 
   // 5) DELETE /posts/:id
   // 아이디에 해당되는 특정 게시물을 삭제하는 API
   @Delete(':id')
-  deletePost(@Param('id') id: string){
-   return this.postsService.deletePost(+id);
+  deletePost(@Param('id') id: string) {
+    return this.postsService.deletePost(+id);
   }
-  
 }
