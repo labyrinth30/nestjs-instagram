@@ -45,61 +45,80 @@ export class PostsService {
     @InjectRepository(PostsModel)
     private readonly postsRepository: Repository<PostsModel>
   ) {}
-  getAllPosts(): PostModel[] {
-    return posts;
+  async getAllPosts()  {
+    return this.postsRepository.find();
   }
 
-  getPostById(id: number): PostModel {
-    const post = posts.find((post) => post.id === +id);
-
-    if (!post) {
+  async getPostById(id: number) {
+    const post = await this.postsRepository.findOne({
+      where: {
+        id,
+      }
+    });
+    if(!post) {
       throw new NotFoundException('게시물을 찾을 수 없습니다.');
     }
     return post;
   }
 
-  createPost(author: string, title: string, content: string) {
-    const post: PostModel = {
-      id: posts[posts.length - 1].id + 1,
-      author: author,
-      title: title,
-      content: content,
+  async createPost(author: string, title: string, content: string) {
+    // 1) create -> 저장할 객체를 생성한다.
+    // 2) save -> 저장할 객체를 저장한다. (create 메서드에서 생성한 객체로)
+    const post = this.postsRepository.create({
+      author,
+      title,
+      content,
       likeCount: 0,
       commentCount: 0,
-    };
-    posts = [...posts, post];
-    return post;
-  }
+    });
 
-  updatePost(
+    const newPost = await this.postsRepository.save(post);
+    return newPost;
+  }
+  async updatePost(
     postId: number,
     author?: string,
     title?: string,
     content?: string,
-  ) {
-    const post = posts.find((post) => post.id === postId);
+  ) : Promise<PostModel>    {
+    // save의 기능
+    // 1) 만약에 데이터가 존재하지 않는다면(id 기준으로)
+    // 2) 새로운 데이터를 생성한다.
+    // 3) 만약에 데이터가 존재한다면(id 기준으로)
+    // 4) 기존의 데이터를 수정한다.
+    const post = await this.postsRepository.findOne({
+      where: {
+        id: postId,
+      }
+    })
     if (!post) {
       throw new NotFoundException('게시물을 찾을 수 없습니다.');
     }
-    if (author) {
+    if(author) {
       post.author = author;
     }
-    if (title) {
+    if(title) {
       post.title = title;
     }
-    if (content) {
+    if(content) {
       post.content = content;
     }
-    posts = posts.map((prevPost) => (prevPost.id === postId ? post : prevPost));
-    return post;
+    const newPost:PostModel =await this.postsRepository.save(post);
+    return newPost;
   }
 
-  deletePost(postId: number) {
-    const post = posts.find((post) => post.id === postId);
-    if (!post) {
-      throw new NotFoundException('게시물을 찾을 수 없습니다.');
+  async deletePost(postId: number) {
+    const post = await this.postsRepository.findOne({
+    where: {
+      id: postId,
     }
-    posts = posts.filter((post) => post.id !== postId);
-    return postId;
+  });
+  if (!post) {
+    throw new NotFoundException('게시물을 찾을 수 없습니다.');
+  }
+
+  await this.postsRepository.delete(postId);
+
+  return postId;
   }
 }
