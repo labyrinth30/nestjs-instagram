@@ -93,4 +93,9 @@ export class AuthService {
     // 3) 모두 통과되면 유저 정보를 반환한다.
     return existingUser;
   }
+
+  async loginWithEmail(user: Pick<UsersModel, 'email' | 'password'>){
+    const existingUser = await this.authenticateWithEmailAndPassword(user);
+    return this.loginUser(existingUser);
+  }
 }
