@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersModel } from './entities/users.entity';
 import { Repository } from 'typeorm';
@@ -11,9 +11,35 @@ export class UsersService {
   ) {
   }
 
-  async createUser(nickname: string, email: string, password: string) {
-    const user = this.usersRepository.create({ nickname, email, password });
-    const newUser = await this.usersRepository.save(user);
+  async createUser(user: Pick<UsersModel, 'email' | 'nickname' | 'password'>) {
+    // 1) 닉네임 중복이 없는지 확인
+    // exist() -> 만약에 조건에 해당하는 데이터가 존재한다면 true, 아니면 false
+    const nicknameExist = await this.usersRepository.exists({
+      where: {
+        nickname: user.nickname,
+      }
+    });
+
+    if(nicknameExist) {
+      throw new BadRequestException('이미 존재하는 닉네임입니다.');
+    }
+
+    // 2) 이메일 중복이 없는지 확인
+    const emailExist = await this.usersRepository.exists({
+      where: {
+        email: user.email,
+      }
+    });
+    if(emailExist) {
+      throw new BadRequestException('이미 가입한 이메일입니다.');
+    }
+
+    const userObject = this.usersRepository.create({
+      email: user.email,
+      nickname: user.nickname,
+      password: user.password,
+    });
+    const newUser = await this.usersRepository.save(userObject);
 
     return newUser;
   }
