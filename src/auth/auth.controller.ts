@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Headers } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -8,13 +8,14 @@ export class AuthController {
   // 로그인
   @Post('login/email')
   loginEmail(
-    @Body('email') email: string,
-    @Body('password') password: string,
+    @Headers('authorization') rawToken: string,
   ) {
-     return this.authService.loginWithEmail({
-       email,
-       password,
-     });
+    // email:password -> base64
+    // fjaioejailfjkal:fnaskjfdfadfa -> email:password
+    const token = this.authService.extractTokenFromHeader(rawToken, false);
+
+    const credentials = this.authService.decodeBasicToken(token);
+     return this.authService.loginWithEmail(credentials);
   }
 
   // 회원가입

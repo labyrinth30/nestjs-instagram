@@ -48,7 +48,7 @@ export class AuthService {
    * {authorization: 'Bearer {token}'}
    */
 
-  async extractTokenFromHeader(header: string, isBearer: boolean) {
+   extractTokenFromHeader(header: string, isBearer: boolean) {
     // 'Basic {token}' -> ['Basic', '{token}']
     // 'Bearer {token}' -> ['Bearer', '{token}']
     const splitToken = header.split(' ');
@@ -60,6 +60,28 @@ export class AuthService {
     }
     const token = splitToken[1];
     return token;
+  }
+
+  /**
+   * Basic 토큰을 디코딩하는 방법
+   * 1) djkalfjioeajo:djfaleioaff -> email:password
+   * 2) email:password -> [email, password]
+   * 3) {email: email, password: password}
+   */
+  decodeBasicToken(base64String: string) {
+    const decoded = Buffer.from(base64String, 'base64').toString('utf-8');
+
+    const split = decoded.split(':');
+    if(split.length !== 2){
+      throw new UnauthorizedException('토큰이 올바르지 않습니다.');
+    }
+    const email = split[0];
+    const password = split[1];
+
+    return {
+      email,
+      password,
+    }
   }
 
   /**
