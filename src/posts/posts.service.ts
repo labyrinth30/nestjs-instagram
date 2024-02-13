@@ -3,41 +3,7 @@ import { Repository } from 'typeorm';
 import { PostsModel } from './entities/posts.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
-export interface PostModel {
-  id: number;
-  author: string;
-  title: string;
-  content: string;
-  likeCount: number;
-  commentCount: number;
-}
 
-let posts: PostModel[] = [
-  {
-    id: 1,
-    author: 'newjeans_offical',
-    title: '뉴진스 민지',
-    content: '메이크업 고치고 있는 민지.',
-    likeCount: 100,
-    commentCount: 150,
-  },
-  {
-    id: 2,
-    author: 'newjeans_offical2',
-    title: '뉴진스 해린',
-    content: '춤 추고 있는 해린.',
-    likeCount: 100,
-    commentCount: 150,
-  },
-  {
-    id: 3,
-    author: 'newjeans_offical3',
-    title: '뉴진스 하니',
-    content: '노래 부르고 있는 하니.',
-    likeCount: 100,
-    commentCount: 150,
-  },
-];
 
 @Injectable()
 export class PostsService {
