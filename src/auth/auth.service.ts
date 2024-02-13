@@ -1,12 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersModel } from '../users/entities/users.entity';
 import { JWT_SECRET } from './const/auth.const';
+import { UsersService } from '../users/users.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
   ) {}
   /**
    * 우리가 만드려는 기능
@@ -35,6 +38,7 @@ export class AuthService {
    *    4. loginWithEmail에서 반환된 데이터를 기반으로 토큰 생성
    *
    */
+
   /**
    * Payload에 들어갈 정보
    *
@@ -65,5 +69,28 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async authenticateWithEmailAndPassword(user: Pick<UsersModel, 'email' | 'password'>) {
+    // 1) email이 존재하는지
+    const existingUser = await this.usersService.getUserByEmail(user.email);
+
+    if (!existingUser) {
+      throw new UnauthorizedException('존재하지 않는 사용자입니다.');
+    }
+    // 2) password가 일치하는지
+    /**
+     * 파라미터
+     *
+     * 1. 입력된 비밀번호
+     * 2. 기존 해시(hash) -> 사용자 정보에 저장되어있는 hash
+     */
+    const passOk: boolean = await bcrypt.compare(user.password, existingUser.password);
+
+    if(!passOk) {
+      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+    }
+    // 3) 모두 통과되면 유저 정보를 반환한다.
+    return existingUser;
   }
 }
