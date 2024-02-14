@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller, DefaultValuePipe,
-  Delete,
-  Get,
-  Param, ParseIntPipe,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { PostsService } from './posts.service';
 
 
@@ -24,7 +16,7 @@ export class PostsController {
   // 2) GET /posts/:id
   // 아이디에 해당되는 특정 게시물을 조회하는 API
   @Get(':id')
-  getPost(@Param('id', ParseIntPipe) id: number) {
+  getPost(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id: number) {
     return this.postsService.getPostById(id);
   }
 
@@ -35,7 +27,6 @@ export class PostsController {
     @Body('authorId') authorId: number,
     @Body('title') title: string,
     @Body('content') content: string,
-    @Body('test', new DefaultValuePipe(true)) isPublic: boolean,
   ) {
     return this.postsService.createPost(authorId, title, content);
   }
