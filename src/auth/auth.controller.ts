@@ -1,5 +1,6 @@
 import { Body, Controller, Post, Headers } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { PasswordPipe } from './pipe/password.pipe';
 
 @Controller('auth')
 export class AuthController {
@@ -49,8 +50,9 @@ export class AuthController {
   // 회원가입
   @Post('register/email')
   postRegisterEmail(
+    // 비밀번호가 8자 이하여야 할 때 유효성 검사를 하는 방법
     @Body('email') email: string,
-    @Body('password') password: string,
+    @Body('password', PasswordPipe) password: string,
     @Body('nickname') nickname: string,
   ) {
     return this.authService.registerWithEmail({
