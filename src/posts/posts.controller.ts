@@ -28,11 +28,11 @@ export class PostsController {
   @Post()
   @UseGuards(AccessTokenGuard)
   postPosts(
-    @User() user: UsersModel,
+    @User('id') userId: number,
     @Body('title') title: string,
     @Body('content') content: string,
   ) {
-    return this.postsService.createPost(user.id, title, content);
+    return this.postsService.createPost(userId, title, content);
   }
 
   // 4) PATCH /posts/:id
