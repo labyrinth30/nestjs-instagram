@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UsersModel } from '../../users/entities/users.entity';
 import { BaseModel } from '../../common/entity/base.entity';
+import { IsString } from 'class-validator';
 
 @Entity()
 export class PostsModel extends BaseModel{
@@ -12,8 +13,14 @@ export class PostsModel extends BaseModel{
   })
   author: UsersModel;
   @Column()
+  @IsString({
+    message: 'title은 string type로 입력해주세요.'
+  })
   title: string;
   @Column()
+  @IsString({
+    message: 'content는 string type로 입력해주세요.'
+  })
   content: string;
   @Column()
   likeCount: number;
