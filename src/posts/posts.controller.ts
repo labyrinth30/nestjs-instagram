@@ -3,6 +3,7 @@ import { PostsService } from './posts.service';
 import { AccessTokenGuard } from '../auth/guard/bearer-token.guard';
 import { User } from '../users/decorator/user.decorator';
 import { UsersModel } from '../users/entities/users.entity';
+import { CreatePostDto } from './dto/create-post.dto';
 
 
 @Controller('posts')
@@ -25,14 +26,17 @@ export class PostsController {
 
   // 3) POST /posts
   // 새로운 게시물을 생성하는 API
+  //
+  // DTO - Data Transfer Object
   @Post()
   @UseGuards(AccessTokenGuard)
   postPosts(
     @User('id') userId: number,
-    @Body('title') title: string,
-    @Body('content') content: string,
+    @Body() body: CreatePostDto,
+    // @Body('title') title: string,
+    // @Body('content') content: string,
   ) {
-    return this.postsService.createPost(userId, title, content);
+    return this.postsService.createPost(userId, body);
   }
 
   // 4) PATCH /posts/:id
