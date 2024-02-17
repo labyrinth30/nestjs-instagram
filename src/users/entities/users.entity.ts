@@ -58,6 +58,7 @@ export class UsersModel extends BaseModel{
   // 1. 유일무이한 값이 될 것
   email: string;
 
+  @Column()
   @IsString({
     message: stringValidationMessage,
     }

@@ -19,7 +19,6 @@ export class UsersController {
 
   @Get()
   @ApiOperation({ summary: '유저 전체 조회', description: '모든 유저를 조회합니다.'})
-  @UseInterceptors(ClassSerializerInterceptor)
   /**
    * serialization -> 직렬화 -> 현재 시스템에서 사용되는 (NestJS) 데이터의 구조를 다른 시스템에서도 사용할 수 있는 포맷으로 변환
    * 여기서는 class의 object -> JSON으로 변환
