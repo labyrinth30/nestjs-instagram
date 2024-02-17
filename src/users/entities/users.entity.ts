@@ -1,11 +1,12 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { RolesEnum } from '../const/roles.const';
 import { PostsModel } from '../../posts/entities/posts.entity';
 import { BaseModel } from '../../common/entity/base.entity';
-import { IsEmail, IsString, Length, ValidationArguments } from 'class-validator';
+import { IsEmail, IsString, Length } from 'class-validator';
 import { lengthValidationMessage } from '../../common/validation-message/length-validation.message';
 import { stringValidationMessage } from '../../common/validation-message/string-validation.message';
 import { emailValidationMessgae } from '../../common/validation-message/email-validation-messgae';
+import { Exclude } from 'class-transformer';
 
 /**
  * id: number
@@ -37,7 +38,7 @@ export class UsersModel extends BaseModel{
     }
   )
   @Length(1, 20,{
-message: lengthValidationMessage
+  message: lengthValidationMessage
   } )
   nickname: string;
 
@@ -58,16 +59,25 @@ message: lengthValidationMessage
   email: string;
 
   @IsString({
-      message: stringValidationMessage,
-    }
-  )
-  @IsString({
     message: stringValidationMessage,
     }
   )
   @Length(3, 20, {
     message: lengthValidationMessage,
   })
+  /**
+   * Request
+   * Frontend -> Backend
+   * plain object (JSON) -> class instance(dto)
+   *
+   * Response
+   * Backend -> Frontend
+   * class instance(dto) -> plain object (JSON)
+   *
+   * toClassOnly: class instance -> plain object -> 요청을 보낼 때만 적용
+   * toPlainOnly: plain object -> class instance -> 응답으로 보낼 때만 적용
+   */
+  @Exclude({ toPlainOnly: true })
   password: string;
 
   @Column({
