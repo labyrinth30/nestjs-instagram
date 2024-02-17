@@ -6,7 +6,7 @@ import { IsEmail, IsString, Length } from 'class-validator';
 import { lengthValidationMessage } from '../../common/validation-message/length-validation.message';
 import { stringValidationMessage } from '../../common/validation-message/string-validation.message';
 import { emailValidationMessgae } from '../../common/validation-message/email-validation-messgae';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 
 /**
  * id: number
@@ -91,4 +91,8 @@ export class UsersModel extends BaseModel{
   posts: PostsModel[];
 
 
+  // @Expose()
+  // get nicknameAndEmail(): string {
+  //   return `${this.nickname} + ${this.email}`;
+  // }
 }
