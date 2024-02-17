@@ -93,8 +93,34 @@ export class PostsService {
   return postId;
   }
 
-  // 오름차순으로 정렬하는 pagination만 구현한다.
   async paginatePosts(dto: PaginatePostDto){
+    if(dto.page){
+      return this.pagePaginatePosts(dto);
+    } else{
+      return this.cursorpaginatePosts(dto);
+    }
+  }
+  async pagePaginatePosts(dto: PaginatePostDto){
+    /**
+     * data: Data[],
+     * total: number,
+     * next는 필요없다.
+     * [1] [2] [3]
+     */
+    const [posts, count] = await this.postsRepository.findAndCount({
+      skip: (dto.page - 1) * dto.take,
+      take: dto.take,
+      order: {
+        createdAt: dto.order_createdAt,
+
+      }});
+    return {
+      data: posts,
+      total: count,
+    }
+  }
+
+  async cursorpaginatePosts(dto: PaginatePostDto){
     const where : FindOptionsWhere<PostsModel> = {};
     if(dto.where__id_less_than){
       /**
@@ -124,9 +150,9 @@ export class PostsService {
      * count: 응답한 데이터의 갯수
      * next: 다음 요청을 할 때 사용할 URL
      */
-    // 해당되는 포스트가 0개 이상이면 마지막 포스트를 가져오고
-    // 0개라면 null을 반환한다.
-    // 반환된 post가 기본값 20개보다 작다면 다음 요청을 할 필요가 없다.
+      // 해당되는 포스트가 0개 이상이면 마지막 포스트를 가져오고
+      // 0개라면 null을 반환한다.
+      // 반환된 post가 기본값 20개보다 작다면 다음 요청을 할 필요가 없다.
     const lastItem = posts.length > 0 && posts.length == dto.take ? posts[posts.length - 1] : null;
 
     const nextUrl = lastItem &&  new URL(`${PROTOCOL}://${HOST}/posts`);
