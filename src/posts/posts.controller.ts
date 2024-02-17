@@ -1,10 +1,24 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Patch, Post, UseGuards, Request } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
+  Request,
+  Query,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { AccessTokenGuard } from '../auth/guard/bearer-token.guard';
 import { User } from '../users/decorator/user.decorator';
 import { UsersModel } from '../users/entities/users.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PaginatePostDto } from './dto/paginate-post.dto';
 
 
 @Controller('posts')
@@ -14,9 +28,23 @@ export class PostsController {
   // 1) GET /posts
   // 모든 게시물을 조회하는 API
   @Get()
-  getPosts() {
-    return this.postsService.getAllPosts();
+  getPosts(
+    @Query() query: PaginatePostDto,
+  ) {
+    return this.postsService.paginatePosts(query);
   }
+
+  paginatePosts(){
+
+  }
+
+  @Post('random')
+  @UseGuards(AccessTokenGuard)
+  async postPostsRandom(@User() user: UsersModel){
+    await this.postsService.generatePosts(user.id);
+    return true;
+  }
+
 
   // 2) GET /posts/:id
   // 아이디에 해당되는 특정 게시물을 조회하는 API
@@ -58,4 +86,6 @@ export class PostsController {
   deletePost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.deletePost(id);
   }
+
+
 }
