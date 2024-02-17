@@ -2,7 +2,10 @@ import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Up
 import { RolesEnum } from '../const/roles.const';
 import { PostsModel } from '../../posts/entities/posts.entity';
 import { BaseModel } from '../../common/entity/base.entity';
-import { IsEmail, IsString, Length } from 'class-validator';
+import { IsEmail, IsString, Length, ValidationArguments } from 'class-validator';
+import { lengthValidationMessage } from '../../common/validation-message/length-validation.message';
+import { stringValidationMessage } from '../../common/validation-message/string-validation.message';
+import { emailValidationMessgae } from '../../common/validation-message/email-validation-messgae';
 
 /**
  * id: number
@@ -29,29 +32,41 @@ export class UsersModel extends BaseModel{
   })
   // 1. 최대 길이 20자
   // 2. 유일무이한 값이 될 것
-  @IsString()
+  @IsString({
+      message: stringValidationMessage,
+    }
+  )
   @Length(1, 20,{
-    message: '닉네임은 1자 이상 20자 이하여야 합니다.'
+message: lengthValidationMessage
   } )
   nickname: string;
 
   @Column({
     unique: true,
   })
-  @IsString()
+  @IsString({
+      message: stringValidationMessage,
+    }
+  )
   @IsEmail(
     {},
     {
-      message: '이메일 형식이 아닙니다.'
+      message: emailValidationMessgae,
     }
   )
   // 1. 유일무이한 값이 될 것
   email: string;
 
-  @Column()
-  @IsString()
+  @IsString({
+      message: stringValidationMessage,
+    }
+  )
+  @IsString({
+    message: stringValidationMessage,
+    }
+  )
   @Length(3, 20, {
-    message: '비밀번호는 3자 이상 20자 이하여야 합니다.'
+    message: lengthValidationMessage,
   })
   password: string;
 
