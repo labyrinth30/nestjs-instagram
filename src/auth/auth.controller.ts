@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { MaxLengthPipe, MinLengthPipe, PasswordPipe } from './pipe/password.pipe';
 import { BasicTokenGuard } from './guard/basic-token.guard';
 import { AccessTokenGuard, RefreshTokenGuard } from './guard/bearer-token.guard';
+import { RegisterUserDto } from './dto/register-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -56,14 +57,10 @@ export class AuthController {
   @Post('register/email')
   postRegisterEmail(
     // 비밀번호가 8자 이하여야 할 때 유효성 검사를 하는 방법
-    @Body('email') email: string,
-    @Body('password', new MaxLengthPipe(8, '비밀번호'), new MinLengthPipe(2, '비밀번호')) password: string,
-    @Body('nickname') nickname: string,
+    @Body() body: RegisterUserDto,
   ) {
-    return this.authService.registerWithEmail({
-      email,
-      password,
-      nickname,
-    });
+    return this.authService.registerWithEmail(
+      body,
+    );
   }
 }
