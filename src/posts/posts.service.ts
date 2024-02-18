@@ -101,7 +101,9 @@ export class PostsService {
     // } else{
     //   return this.cursorPaginatePosts(dto);
     // }
-    return this.commonService.paginate(dto, this.postsRepository, {}, 'posts');
+    return this.commonService.paginate(dto, this.postsRepository, {
+      relations: ['author'],
+    }, 'posts');
   }
   async pagePaginatePosts(dto: PaginatePostDto){
     /**
@@ -114,7 +116,7 @@ export class PostsService {
       skip: (dto.page - 1) * dto.take,
       take: dto.take,
       order: {
-        createdAt: dto.order_createdAt,
+        createdAt: dto.order__createdAt,
 
       }});
     return {
@@ -139,7 +141,7 @@ export class PostsService {
     const posts = await this.postsRepository.find({
       where,
       order: {
-        createdAt: dto.order_createdAt,
+        createdAt: dto.order__createdAt,
       },
       take: dto.take,
     });
@@ -177,7 +179,7 @@ export class PostsService {
       }
       let key = null;
 
-      if(dto.order_createdAt === 'ASC'){
+      if(dto.order__createdAt === 'ASC'){
         key = 'where__id_more_than';
       }
       else{

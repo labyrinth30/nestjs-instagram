@@ -21,7 +21,7 @@ export class BasePaginationDto {
   // createdAt -> 생성된 시간의 내림차/오름차 순으로 정렬
   @IsIn(['ASC', 'DESC'])
   @IsOptional()
-  order_createdAt: 'ASC' | 'DESC' = 'ASC';
+  order__createdAt: 'ASC' | 'DESC' = 'ASC';
 
   // 가져올 데이터의 개수
   @IsNumber()

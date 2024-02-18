@@ -74,7 +74,7 @@ export class CommonService {
       }
       let key = null;
 
-      if(dto.order_createdAt === 'ASC'){
+      if(dto.order__createdAt === 'ASC'){
         key = 'where__id__more_than';
       }
       else{
