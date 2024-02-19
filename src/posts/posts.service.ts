@@ -5,8 +5,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
-import { HOST, PROTOCOL } from '../common/const/env.const';
 import { CommonService } from '../common/common.service';
+import { ENV_HOST_KEY, ENV_PROTOCOL_KEY } from '../common/const/env-keys.const';
+import { ConfigService } from '@nestjs/config';
 
 
 
@@ -16,6 +17,7 @@ export class PostsService {
     @InjectRepository(PostsModel)
     private readonly postsRepository: Repository<PostsModel>,
     private readonly commonService: CommonService,
+    private readonly configService: ConfigService,
   ) {}
   async getAllPosts()  {
     return this.postsRepository.find({
@@ -159,6 +161,9 @@ export class PostsService {
       // 0개라면 null을 반환한다.
       // 반환된 post가 기본값 20개보다 작다면 다음 요청을 할 필요가 없다.
     const lastItem = posts.length > 0 && posts.length == dto.take ? posts[posts.length - 1] : null;
+
+    const PROTOCOL = this.configService.get<string>(ENV_PROTOCOL_KEY);
+    const HOST = this.configService.get<string>(ENV_HOST_KEY);
 
     const nextUrl = lastItem &&  new URL(`${PROTOCOL}://${HOST}/posts`);
 
