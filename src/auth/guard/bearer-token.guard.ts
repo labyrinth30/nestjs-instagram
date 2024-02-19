@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 import { UsersService } from '../../users/users.service';
+import { CommonService } from '../../common/common.service';
 
 @Injectable()
 export class BearerTokenGuard implements CanActivate {

@@ -60,15 +60,15 @@ export class PostsController {
   // DTO - Data Transfer Object
   @Post()
   @UseGuards(AccessTokenGuard)
-  @UseInterceptors(FileInterceptor('image'))
-  postPosts(
+  async postPosts(
     @User('id') userId: number,
     @Body() body: CreatePostDto,
     @UploadedFile() file?: Express.Multer.File,
     // @Body('title') title: string,
     // @Body('content') content: string,
   ) {
-    return this.postsService.createPost(userId, body, file?.filename);
+    await this.postsService.createPostImage(body)
+    return this.postsService.createPost(userId, body);
   }
 
   // 4) PATCH /posts/:id
