@@ -10,10 +10,11 @@ import { JwtService } from '@nestjs/jwt';
 import { CommonModule } from '../common/common.module';
 import { CommonService } from '../common/common.service';
 import { AuthModule } from '../auth/auth.module';
+import { ImageModel } from '../common/entity/image.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([
-    PostsModel, UsersModel,
+    PostsModel, UsersModel, ImageModel,
   ]),
     CommonModule,
     AuthModule,

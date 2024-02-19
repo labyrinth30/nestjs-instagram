@@ -1,13 +1,15 @@
 import { BaseModel } from './base.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { POST_IMAGE_PATH } from '../const/path.const';
+import { POST_IMAGE_PATH, POST_PUBLIC_IMAGE_PATH } from '../const/path.const';
 import { join } from 'path';
 import { PostsModel } from '../../posts/entities/posts.entity';
+import { UsersModel } from '../../users/entities/users.entity';
 
 export enum ImageModelType {
   POST_IMAGE,
+  USER_PROFILE_IMAGE,
 }
 
 @Entity()
@@ -32,11 +34,16 @@ export class ImageModel extends BaseModel{
   @IsString()
   @Transform(({value, obj}) => {
     if(obj.type === ImageModelType.POST_IMAGE){
-      return join(
-       POST_IMAGE_PATH,
+      return `/${join(
+       POST_PUBLIC_IMAGE_PATH,
         value,
-      );
-    } else{
+      )}`;
+    } else if (obj.type === ImageModelType.USER_PROFILE_IMAGE){
+      return `/${join(
+        POST_PUBLIC_IMAGE_PATH,
+        value,
+      )}`;
+    }else{
       return value;
     }
   })
@@ -44,4 +51,8 @@ export class ImageModel extends BaseModel{
 
   @ManyToOne(() => PostsModel, (post) => post.images, )
   post?: PostsModel;
+
+  @OneToOne(() => UsersModel, (user) => user.profileImage)
+  @JoinColumn()
+  user?: UsersModel;
 }

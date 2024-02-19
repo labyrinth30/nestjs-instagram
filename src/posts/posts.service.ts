@@ -11,6 +11,9 @@ import { ConfigService } from '@nestjs/config';
 import { join, basename } from 'path';
 import { POST_IMAGE_PATH, PUBLIC_FOLDER_PATH, TEMP_FOLDER_PATH } from '../common/const/path.const';
 import { promises } from 'fs';
+import { CreatePostImageDto } from './image/dto/create-image.dto';
+import { ImageModel } from '../common/entity/image.entity';
+import { DEFAULT_POST_FIND_OPTIONS } from './dto/default-post-find-options.const';
 
 
 @Injectable()
@@ -18,18 +21,21 @@ export class PostsService {
   constructor(
     @InjectRepository(PostsModel)
     private readonly postsRepository: Repository<PostsModel>,
+
+    @InjectRepository(ImageModel)
+    private readonly imageRepository: Repository<ImageModel>,
     private readonly commonService: CommonService,
     private readonly configService: ConfigService,
   ) {}
   async getAllPosts()  {
     return this.postsRepository.find({
-      relations: ['author'],
+      ...DEFAULT_POST_FIND_OPTIONS,
     });
   }
 
   async getPostById(id: number) {
     const post = await this.postsRepository.findOne({
-      relations: ['author'],
+      ...DEFAULT_POST_FIND_OPTIONS,
       where: {
         id,
       }
@@ -48,6 +54,7 @@ export class PostsService {
         id: authorId,
       },
       ...postDto,
+      images: [],
       likeCount: 0,
       commentCount: 0,
     });
@@ -55,12 +62,12 @@ export class PostsService {
     const newPost = await this.postsRepository.save(post);
     return newPost;
   }
-  async createPostImage(dto: CreatePostDto){
+  async createPostImage(dto: CreatePostImageDto){
     // dto의 이미지 이름을 기반으로
     // 파일의 경로를 생성한다.
     const tempFilePath = join(
       TEMP_FOLDER_PATH,
-      dto.image,
+      dto.path,
     );
     try{
       // 파일이 존재하는 지 확인
@@ -80,9 +87,13 @@ export class PostsService {
       POST_IMAGE_PATH,
       fileName,
     );
+    // save
+    const result = await this.imageRepository.save({
+      ...dto,
+    });
     // 파일 옮기기
     await promises.rename(tempFilePath, newFilePath);
-    return true;
+    return result;
   }
 
   async updatePost(
@@ -135,9 +146,12 @@ export class PostsService {
     // } else{
     //   return this.cursorPaginatePosts(dto);
     // }
-    return this.commonService.paginate(dto, this.postsRepository, {
-      relations: ['author'],
-    }, 'posts');
+    return this.commonService.paginate(dto, this.postsRepository,
+      {
+        ...DEFAULT_POST_FIND_OPTIONS,
+      },
+        'posts',
+      );
   }
   async pagePaginatePosts(dto: PaginatePostDto){
     /**
@@ -240,6 +254,7 @@ export class PostsService {
       await this.createPost(userId, {
         title: `테스트 게시물 ${i}`,
         content: `테스트 게시물 ${i}의 내용`,
+        images: [],
       });
     }
   }
