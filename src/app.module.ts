@@ -17,11 +17,19 @@ import {
   ENV_DB_USERNAME_KEY,
   ENV_HOST_KEY,
 } from './common/const/env-keys.const';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
 
 @Module({
   imports: [
     PostsModule,
     UsersModule,
+    ServeStaticModule.forRoot({
+      // 30022.jpg
+      // http://localhost:3000/public/posts/30022.jpg으로 요청 보내기 위함
+      rootPath: PUBLIC_FOLDER_PATH,
+      serveRoot: '/public',
+    }),
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
