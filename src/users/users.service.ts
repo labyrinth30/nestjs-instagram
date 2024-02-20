@@ -2,6 +2,9 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersModel } from './entities/users.entity';
 import { Repository } from 'typeorm';
+import { CreateUserDto } from './entities/create-user.dto';
+import { CreateProfileImageDto } from './image/dto/create-profile-image.dto';
+import { join } from 'path';
 
 @Injectable()
 export class UsersService {
@@ -11,12 +14,12 @@ export class UsersService {
   ) {
   }
 
-  async createUser(user: Pick<UsersModel, 'email' | 'nickname' | 'password'>) {
+  async createUser(dto: CreateUserDto) {
     // 1) 닉네임 중복이 없는지 확인
     // exist() -> 만약에 조건에 해당하는 데이터가 존재한다면 true, 아니면 false
     const nicknameExist = await this.usersRepository.exists({
       where: {
-        nickname: user.nickname,
+        nickname: dto.nickname,
       }
     });
 
@@ -27,7 +30,7 @@ export class UsersService {
     // 2) 이메일 중복이 없는지 확인
     const emailExist = await this.usersRepository.exists({
       where: {
-        email: user.email,
+        email: dto.email,
       }
     });
     if(emailExist) {
@@ -35,9 +38,9 @@ export class UsersService {
     }
 
     const userObject = this.usersRepository.create({
-      email: user.email,
-      nickname: user.nickname,
-      password: user.password,
+      email: dto.email,
+      nickname: dto.nickname,
+      password: dto.password,
     });
     const newUser = await this.usersRepository.save(userObject);
 
@@ -55,4 +58,6 @@ export class UsersService {
       }
     });
   }
+
+
 }

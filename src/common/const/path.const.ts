@@ -8,6 +8,9 @@ export const PUBLIC_FOLDER_NAME = 'public';
 export const POSTS_FOLDER_NAME = 'posts';
 // 임시폴더 이름
 export const TEMP_FOLDER_NAME = 'temp';
+// 프로필 이미지들을 저장할 폴더 이름
+export const USERS_FOLDER_NAME = 'users';
+
 // 실제 공개폴더의 절대경로
 // {프로젝트 위치}/public
 export const PUBLIC_FOLDER_PATH = join(
@@ -20,6 +23,20 @@ export const PUBLIC_FOLDER_PATH = join(
 export const POST_IMAGE_PATH = join(
   PUBLIC_FOLDER_PATH,
   POSTS_FOLDER_NAME,
+);
+
+// 프로필 이미지를 저장할 폴더
+// /{프로젝트 위치}/public/users
+export const USER_IMAGE_PATH = join(
+  PUBLIC_FOLDER_PATH,
+  USERS_FOLDER_NAME,
+);
+
+// 절대경로x
+// /public/users/xxx.jpg
+export const USER_PUBLIC_IMAGE_PATH=  join(
+  PUBLIC_FOLDER_NAME,
+  USERS_FOLDER_NAME,
 );
 
 // 절대경로x

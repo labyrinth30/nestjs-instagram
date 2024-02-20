@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { RolesEnum } from '../const/roles.const';
 import { PostsModel } from '../../posts/entities/posts.entity';
 import { BaseModel } from '../../common/entity/base.entity';
@@ -7,6 +7,7 @@ import { lengthValidationMessage } from '../../common/validation-message/length-
 import { stringValidationMessage } from '../../common/validation-message/string-validation.message';
 import { emailValidationMessgae } from '../../common/validation-message/email-validation-messgae';
 import { Exclude, Expose } from 'class-transformer';
+import { ImageModel } from '../../common/entity/image.entity';
 
 /**
  * id: number
@@ -18,6 +19,10 @@ import { Exclude, Expose } from 'class-transformer';
  * password: string
  *
  * role: [RolesEnum.USER, RolesEnum.ADMIN]
+ *
+ * posts: PostsModel[]
+ *
+ * profileImage: ImageModel
  *
  * createdAt: Date
  *
@@ -90,6 +95,8 @@ export class UsersModel extends BaseModel{
   @OneToMany(() => PostsModel, (post) => post.author)
   posts: PostsModel[];
 
+  @OneToOne(()=> ImageModel, (image) => image.user)
+  profileImage: ImageModel;
 
   // @Expose()
   // get nicknameAndEmail(): string {

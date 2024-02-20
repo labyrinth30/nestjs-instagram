@@ -1,6 +1,7 @@
 import { Body, ClassSerializerInterceptor, Controller, Get, Post, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateUserDto } from './entities/create-user.dto';
 
 @Controller('users')
 @ApiTags('유저 API')
@@ -10,11 +11,9 @@ export class UsersController {
   @Post()
   @ApiOperation({ summary: '유저 생성하기', description: '유저를 생성합니다.'})
   postUser(
-    @Body('nickname') nickname: string,
-    @Body('email') email: string,
-    @Body('password') password: string,
+    @Body('nickname') body: CreateUserDto
   ){
-    return this.usersService.createUser({email, nickname, password});
+    return this.usersService.createUser(body);
   }
 
   @Get()
