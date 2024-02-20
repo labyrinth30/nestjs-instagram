@@ -10,7 +10,7 @@ import {
   Post,
   Query,
   UploadedFile,
-  UseGuards,
+  UseGuards, UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { AccessTokenGuard } from '../auth/guard/bearer-token.guard';
@@ -22,6 +22,7 @@ import { PaginatePostDto } from './dto/paginate-post.dto';
 import { ImageModelType } from '../common/entity/image.entity';
 import { DataSource } from 'typeorm';
 import { PostsImagesService } from './image/image.service';
+import { LogInterceptor } from '../common/interceptor/log.interceptor';
 
 
 @Controller('posts')
@@ -34,6 +35,7 @@ export class PostsController {
   // 1) GET /posts
   // 모든 게시물을 조회하는 API
   @Get()
+  @UseInterceptors(LogInterceptor)
   getPosts(
     @Query() query: PaginatePostDto,
   ) {
@@ -119,10 +121,6 @@ export class PostsController {
       await qr.release();
       throw new InternalServerErrorException('에러가 생겼습니다.');
     }
-
-
-
-
   }
 
   // 4) PATCH /posts/:id
