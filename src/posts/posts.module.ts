@@ -11,6 +11,7 @@ import { CommonModule } from '../common/common.module';
 import { CommonService } from '../common/common.service';
 import { AuthModule } from '../auth/auth.module';
 import { ImageModel } from '../common/entity/image.entity';
+import { PostsImagesService } from './image/image.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([
@@ -20,6 +21,6 @@ import { ImageModel } from '../common/entity/image.entity';
     AuthModule,
   ],
   controllers: [PostsController],
-  providers: [PostsService, UsersService, AuthService, JwtService,CommonService],
+  providers: [PostsService, UsersService, AuthService, JwtService,CommonService, PostsImagesService,],
 })
 export class PostsModule {}
