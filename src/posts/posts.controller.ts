@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,7 +10,7 @@ import {
   Patch,
   Post,
   Query,
-  UploadedFile,
+  UploadedFile, UseFilters,
   UseGuards, UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
@@ -25,6 +26,7 @@ import { PostsImagesService } from './image/image.service';
 import { LogInterceptor } from '../common/interceptor/log.interceptor';
 import { TransactionInterceptor } from '../common/interceptor/transaction.interceptor';
 import { QueryRunner } from '../common/decorator/query-runner.decorator';
+import { HttpExceptionFilter } from '../common/interceptor/http.exception-filter';
 
 
 @Controller('posts')
@@ -37,10 +39,13 @@ export class PostsController {
   // 1) GET /posts
   // 모든 게시물을 조회하는 API
   @Get()
+  @UseFilters(HttpExceptionFilter)
   @UseInterceptors(LogInterceptor)
   getPosts(
     @Query() query: PaginatePostDto,
   ) {
+    // 에러 테스트해보기
+    throw new BadRequestException('에러가 발생했습니다.');
     return this.postsService.paginatePosts(query);
   }
 
@@ -117,6 +122,4 @@ export class PostsController {
   deletePost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.deletePost(id);
   }
-
-
 }
