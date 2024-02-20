@@ -40,12 +40,9 @@ export class PostsController {
   // 모든 게시물을 조회하는 API
   @Get()
   @UseFilters(HttpExceptionFilter)
-  @UseInterceptors(LogInterceptor)
   getPosts(
     @Query() query: PaginatePostDto,
   ) {
-    // 에러 테스트해보기
-    throw new BadRequestException('에러가 발생했습니다.');
     return this.postsService.paginatePosts(query);
   }
 

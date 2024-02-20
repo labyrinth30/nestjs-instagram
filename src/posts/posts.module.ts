@@ -1,4 +1,4 @@
-import { BadRequestException, Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,6 +12,7 @@ import { CommonService } from '../common/common.service';
 import { AuthModule } from '../auth/auth.module';
 import { ImageModel } from '../common/entity/image.entity';
 import { PostsImagesService } from './image/image.service';
+import { LogMiddleware } from '../common/middleware/log-middleware';
 
 @Module({
   imports: [TypeOrmModule.forFeature([

@@ -22,8 +22,7 @@ async function bootstrap() {
     whitelist: true,
     forbidNonWhitelisted: true,
   }));
-  // 글로벌하게 에러핸들링을 하기 위해 사용
-  app.useGlobalFilters(new HttpExceptionFilter())
+
   await app.listen(3000);
 }
 bootstrap();
