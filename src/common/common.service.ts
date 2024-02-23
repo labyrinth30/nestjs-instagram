@@ -69,7 +69,7 @@ export class CommonService {
        * 키값에 해당되는 밸류가 존재하면
        * param에 그대로 붙여넣는다.
        *
-       * 단, where__id__more_than 값만 lastItemm의 마지막 값으로 넣어준다
+       * 단, where__id__more_than 값만 lastItem의 마지막 값으로 넣어준다
        */
       for(const key of Object.keys(dto)){
         if(dto[key]){
