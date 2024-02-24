@@ -8,10 +8,8 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CreateChatDto } from './dto/create-chat.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ChatsModel } from './entity/chat.entity';
-import { Repository } from 'typeorm';
 import { ChatsService } from './chats.service';
+import { CommonService } from '../common/common.service';
 
 @WebSocketGateway({
   // ws://localhost:3000/chats
@@ -19,11 +17,14 @@ import { ChatsService } from './chats.service';
 
 })
 export class ChatsGateway implements OnGatewayConnection {
-  @WebSocketServer()
-  server: Server;
   constructor(
     private readonly chatsService: ChatsService,
+    private readonly commonService: CommonService,
   ) {}
+
+  @WebSocketServer()
+  server: Server;
+
 
   handleConnection(socket: Socket) {
     console.log(`on connect called: ${socket.id}`);
