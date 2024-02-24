@@ -40,4 +40,15 @@ export class ChatsService {
       }
     })
   }
+
+  async checkIfChatExists(chatId: number){
+    // 필요없는 Chat에 들어가는 경우를 막기 위함
+    const exists = await this.chatsRepository.exists({
+      where: {
+        id: chatId,
+      }
+    });
+
+    return exists;
+  }
 }

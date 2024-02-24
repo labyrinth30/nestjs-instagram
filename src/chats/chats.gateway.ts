@@ -4,12 +4,13 @@ import {
   OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
-  WebSocketServer,
+  WebSocketServer, WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { ChatsService } from './chats.service';
 import { CommonService } from '../common/common.service';
+import { EnterChatDto } from './dto/enter-chat.dto';
 
 @WebSocketGateway({
   // ws://localhost:3000/chats
@@ -32,15 +33,21 @@ export class ChatsGateway implements OnGatewayConnection {
   // socket.on('send_message', (message) => { console.log(message); });
 
   @SubscribeMessage('enter_chat')
-  enterChat(
+  async enterChat(
     // 방의 chat Id들을 리스트로 받는다.
-    @MessageBody() data: number[],
+    @MessageBody() data: EnterChatDto,
     @ConnectedSocket() socket: Socket,
   ){
-    for(const chatId of data){
-      // socket.join() 실행해야 한다.
-      socket.join(chatId.toString());
+    for(const chatId of data.chatIds){
+      const exists = await this.chatsService.checkIfChatExists(chatId);
+      if(!exists){
+        throw new WsException({
+          message: `존재하지 않는 chat입니다. chatId: ${chatId}`,
+          code: 404,
+        });
+      }
     }
+    socket.join(data.chatIds.map((x) => x.toString()));
   }
 
   @SubscribeMessage('send_message')
