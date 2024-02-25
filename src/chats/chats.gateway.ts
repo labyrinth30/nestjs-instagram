@@ -11,6 +11,8 @@ import { CreateChatDto } from './dto/create-chat.dto';
 import { ChatsService } from './chats.service';
 import { CommonService } from '../common/common.service';
 import { EnterChatDto } from './dto/enter-chat.dto';
+import { CreateMessagesDto } from './messages/dto/create-messages.dto';
+import { ChatsMessagesService } from './messages/messages.service';
 
 @WebSocketGateway({
   // ws://localhost:3000/chats
@@ -21,6 +23,7 @@ export class ChatsGateway implements OnGatewayConnection {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly commonService: CommonService,
+    private readonly messageService: ChatsMessagesService,
   ) {}
 
   @WebSocketServer()
@@ -51,8 +54,8 @@ export class ChatsGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage('send_message')
-  sendMessage(
-    @MessageBody() message: { message: string, chatId: number },
+  async sendMessage(
+    @MessageBody() dto: CreateMessagesDto,
     @ConnectedSocket() socket: Socket,
   ){
     // 선택한 chatID의 방에 있는 사용자만 메시지를 받는다.
@@ -60,7 +63,16 @@ export class ChatsGateway implements OnGatewayConnection {
 
     // broadcating 방법
     // 보낸 사람 빼고 모두에게 보낸다.
-    socket.to(message.chatId.toString()).emit('receive_message', message.message);
+    // 우선 chat이 존재하는 지 확인한다.
+    const chat = await this.chatsService.checkIfChatExists(dto.chatId);
+    if(!chat){
+      throw new WsException({
+        message: `존재하지 않는 chat입니다. chatId: ${dto.chatId}`,
+        code: 404,
+      });
+    }
+    const message = await this.messageService.createMessage(dto);
+    socket.to(message.chat.id.toString()).emit('receive_message', message.message);
   }
 
   @SubscribeMessage('create_chat')

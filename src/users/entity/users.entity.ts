@@ -9,6 +9,7 @@ import { emailValidationMessgae } from '../../common/validation-message/email-va
 import { Exclude, Expose } from 'class-transformer';
 import { ImageModel } from '../../common/entity/image.entity';
 import { ChatsModel } from '../../chats/entity/chat.entity';
+import { MessagesModel } from '../../chats/messages/entity/messages.entity';
 
 /**
  * id: number
@@ -107,4 +108,7 @@ export class UsersModel extends BaseModel{
   @ManyToMany(() => ChatsModel, (chat) => chat.users)
   @JoinTable()
   chats: ChatsModel[];
+
+  @OneToMany(() => MessagesModel, (message) => message.author)
+  messages: MessagesModel;
 }

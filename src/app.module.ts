@@ -30,6 +30,7 @@ import { ImageModel } from './common/entity/image.entity';
 import { LogMiddleware } from './common/middleware/log-middleware';
 import { ChatsModule } from './chats/chats.module';
 import { ChatsModel } from './chats/entity/chat.entity';
+import { MessagesModel } from './chats/messages/entity/messages.entity';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { ChatsModel } from './chats/entity/chat.entity';
         UsersModel,
         ImageModel,
         ChatsModel,
+        MessagesModel,
       ],
       synchronize: true,
     }),
