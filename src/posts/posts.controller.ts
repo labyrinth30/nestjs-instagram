@@ -26,7 +26,7 @@ import { PostsImagesService } from './image/image.service';
 import { LogInterceptor } from '../common/interceptor/log.interceptor';
 import { TransactionInterceptor } from '../common/interceptor/transaction.interceptor';
 import { QueryRunner } from '../common/decorator/query-runner.decorator';
-import { HttpExceptionFilter } from '../common/interceptor/http.exception-filter';
+import { HttpExceptionFilter } from '../common/exception-filter/http.exception-filter';
 
 
 @Controller('posts')
