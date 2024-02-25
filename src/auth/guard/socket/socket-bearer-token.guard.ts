@@ -10,7 +10,7 @@ export class SocketBearerTokenGuard implements CanActivate{
     private readonly userService: UsersService,
   ){}
   async canActivate(context: ExecutionContext): Promise<boolean>{
-    try {
+
       // 지금 연결하여 통신중인 소켓 가져오기
       const socket = context.switchToWs().getClient();
       const headers = socket.handshake.headers;
@@ -20,6 +20,7 @@ export class SocketBearerTokenGuard implements CanActivate{
       if(!rawToken){
         throw new WsException('인증 토큰이 필요합니다.');
       }
+    try {
       const token = this.authService.extractTokenFromHeader(rawToken, true);
       const payload = this.authService.verifyToken(token);
       const user = await this.userService.getUserByEmail(payload.email);

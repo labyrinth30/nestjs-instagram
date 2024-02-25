@@ -29,13 +29,16 @@ export class ChatsMessagesService {
   }
 
   // Create
-  async createMessage(dto: CreateMessagesDto){
+  async createMessage(
+    dto: CreateMessagesDto,
+    authorId: number,
+    ){
     const message = await this.messageRepository.save({
       chat: {
         id: dto.chatId,
       },
       author: {
-        id: dto.authorId,
+        id: authorId,
       },
       message: dto.message,
     });
