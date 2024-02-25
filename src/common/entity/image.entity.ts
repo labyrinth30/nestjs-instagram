@@ -4,8 +4,8 @@ import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { POST_IMAGE_PATH, POST_PUBLIC_IMAGE_PATH } from '../const/path.const';
 import { join } from 'path';
-import { PostsModel } from '../../posts/entities/posts.entity';
-import { UsersModel } from '../../users/entities/users.entity';
+import { PostsModel } from '../../posts/entity/posts.entity';
+import { UsersModel } from '../../users/entity/users.entity';
 
 export enum ImageModelType {
   POST_IMAGE,

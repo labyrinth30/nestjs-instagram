@@ -1,7 +1,7 @@
 import { Body, ClassSerializerInterceptor, Controller, Get, Post, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateUserDto } from './entities/create-user.dto';
+import { CreateUserDto } from './entity/create-user.dto';
 
 @Controller('users')
 @ApiTags('유저 API')

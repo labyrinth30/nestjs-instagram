@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UsersModel } from '../../users/entities/users.entity';
+import { UsersModel } from '../../users/entity/users.entity';
 import { BaseModel } from '../../common/entity/base.entity';
 import { IsString } from 'class-validator';
 import { stringValidationMessage } from '../../common/validation-message/string-validation.message';

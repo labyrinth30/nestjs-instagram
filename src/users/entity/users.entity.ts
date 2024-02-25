@@ -1,6 +1,6 @@
-import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, OneToOne } from 'typeorm';
 import { RolesEnum } from '../const/roles.const';
-import { PostsModel } from '../../posts/entities/posts.entity';
+import { PostsModel } from '../../posts/entity/posts.entity';
 import { BaseModel } from '../../common/entity/base.entity';
 import { IsEmail, IsString, Length } from 'class-validator';
 import { lengthValidationMessage } from '../../common/validation-message/length-validation.message';
@@ -8,6 +8,8 @@ import { stringValidationMessage } from '../../common/validation-message/string-
 import { emailValidationMessgae } from '../../common/validation-message/email-validation-messgae';
 import { Exclude, Expose } from 'class-transformer';
 import { ImageModel } from '../../common/entity/image.entity';
+import { ChatsModel } from '../../chats/entity/chat.entity';
+import { MessagesModel } from '../../chats/messages/entity/messages.entity';
 
 /**
  * id: number
@@ -102,4 +104,11 @@ export class UsersModel extends BaseModel{
   // get nicknameAndEmail(): string {
   //   return `${this.nickname} + ${this.email}`;
   // }
+
+  @ManyToMany(() => ChatsModel, (chat) => chat.users)
+  @JoinTable()
+  chats: ChatsModel[];
+
+  @OneToMany(() => MessagesModel, (message) => message.author)
+  messages: MessagesModel;
 }
