@@ -13,6 +13,8 @@ import { CommonService } from '../common/common.service';
 import { EnterChatDto } from './dto/enter-chat.dto';
 import { CreateMessagesDto } from './messages/dto/create-messages.dto';
 import { ChatsMessagesService } from './messages/messages.service';
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { SocketCatchHttpExceptionFilter } from '../common/exception-filter/socket-catch-http.exception-filter';
 
 @WebSocketGateway({
   // ws://localhost:3000/chats
@@ -35,6 +37,15 @@ export class ChatsGateway implements OnGatewayConnection {
   }
   // socket.on('send_message', (message) => { console.log(message); });
 
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }))
   @SubscribeMessage('enter_chat')
   async enterChat(
     // 방의 chat Id들을 리스트로 받는다.
@@ -75,11 +86,22 @@ export class ChatsGateway implements OnGatewayConnection {
     socket.to(message.chat.id.toString()).emit('receive_message', message.message);
   }
 
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }))
+  @UseFilters(SocketCatchHttpExceptionFilter)
   @SubscribeMessage('create_chat')
   async createChat(
     @MessageBody() data: CreateChatDto,
     @ConnectedSocket() socket: Socket,
   ){
+
     const chat = await this.chatsService.createChat(
       data,
     );
