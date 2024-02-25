@@ -1,7 +1,7 @@
 import {
   ConnectedSocket,
   MessageBody,
-  OnGatewayConnection,
+  OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer, WsException,
@@ -25,7 +25,7 @@ import { AuthService } from '../auth/auth.service';
   namespace: 'chats',
 
 })
-export class ChatsGateway implements OnGatewayConnection {
+export class ChatsGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly userService: UsersService,
@@ -33,9 +33,20 @@ export class ChatsGateway implements OnGatewayConnection {
     private readonly authService: AuthService,
   ) {}
 
+  // 실제 서버를 인젝트 받을 때 사용
   @WebSocketServer()
   server: Server;
 
+  // gateway가 초기화되었을 떄 실행되는 라이프사이클
+  afterInit(server: any): any {
+    // server는 실제 웹소켓 서버를 가리킨다.
+    console.log('after gateway init');
+  }
+
+  // 연결 해제될 때 실행되는 라이프사이클
+  handleDisconnect(socket: any): any {
+    console.log(`on disconnect called : ${socket.id}`);
+  }
 
   async handleConnection(socket: Socket & {user: UsersModel}) {
     // 소켓에 사용자 정보 저장하기
