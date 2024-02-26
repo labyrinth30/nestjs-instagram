@@ -9,7 +9,7 @@ import { CommonService } from '../common/common.service';
 import { ENV_HOST_KEY, ENV_PROTOCOL_KEY } from '../common/const/env-keys.const';
 import { ConfigService } from '@nestjs/config';
 import { ImageModel } from '../common/entity/image.entity';
-import { DEFAULT_POST_FIND_OPTIONS } from './dto/default-post-find-options.const';
+import { DEFAULT_POST_FIND_OPTIONS } from './const/default-post-find-options.const';
 
 
 @Injectable()
