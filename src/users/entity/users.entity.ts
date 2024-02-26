@@ -10,6 +10,7 @@ import { Exclude, Expose } from 'class-transformer';
 import { ImageModel } from '../../common/entity/image.entity';
 import { ChatsModel } from '../../chats/entity/chat.entity';
 import { MessagesModel } from '../../chats/messages/entity/messages.entity';
+import { CommentsModel } from '../../posts/comments/entity/comments.entity';
 
 /**
  * id: number
@@ -111,4 +112,7 @@ export class UsersModel extends BaseModel{
 
   @OneToMany(() => MessagesModel, (message) => message.author)
   messages: MessagesModel;
+
+  @OneToMany(() => CommentsModel, (comment) => comment.author)
+  postComments: CommentsModel[];
 }

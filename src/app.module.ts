@@ -31,6 +31,8 @@ import { LogMiddleware } from './common/middleware/log-middleware';
 import { ChatsModule } from './chats/chats.module';
 import { ChatsModel } from './chats/entity/chat.entity';
 import { MessagesModel } from './chats/messages/entity/messages.entity';
+import { CommentsModule } from './posts/comments/comments.module';
+import { CommentsModel } from './posts/comments/entity/comments.entity';
 
 @Module({
   imports: [
@@ -60,12 +62,14 @@ import { MessagesModel } from './chats/messages/entity/messages.entity';
         ImageModel,
         ChatsModel,
         MessagesModel,
+        CommentsModel,
       ],
       synchronize: true,
     }),
     AuthModule,
     CommonModule,
     ChatsModule,
+    CommentsModule,
 
   ],
   controllers: [AppController],
