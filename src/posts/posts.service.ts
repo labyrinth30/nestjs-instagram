@@ -232,4 +232,12 @@ export class PostsService {
       });
     }
   }
+
+  async checkPostExistsById(id: number){
+    return this.postsRepository.exists({
+      where: {
+        id,
+      }
+    })
+  }
 }

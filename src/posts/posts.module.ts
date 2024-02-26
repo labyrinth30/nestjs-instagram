@@ -13,15 +13,18 @@ import { AuthModule } from '../auth/auth.module';
 import { ImageModel } from '../common/entity/image.entity';
 import { PostsImagesService } from './image/image.service';
 import { LogMiddleware } from '../common/middleware/log-middleware';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([
-    PostsModel, UsersModel, ImageModel,
+    PostsModel, ImageModel,
   ]),
     CommonModule,
     AuthModule,
+    UsersModule,
   ],
   controllers: [PostsController],
-  providers: [PostsService, UsersService, AuthService, JwtService,CommonService, PostsImagesService,],
+  providers: [PostsService, PostsImagesService,],
+  exports: [PostsService],
 })
 export class PostsModule {}
