@@ -30,6 +30,7 @@ import { HttpExceptionFilter } from '../common/exception-filter/http.exception-f
 import { RolesEnum } from '../users/const/roles.const';
 import { Roles } from '../users/decorator/roles.decorator';
 import { IsPublic } from '../common/decorator/is-public.decorator';
+import { IsPostMineOrAdminGuard } from './guard/is-post-mine-or-admin.guard';
 
 
 @Controller('posts')
@@ -106,9 +107,10 @@ export class PostsController {
 
   // 4) PATCH /posts/:id
   // 아이디에 해당되는 특정 게시물을 수정하는 API
-  @Patch(':id')
+  @Patch(':postId')
+  @UseGuards(IsPostMineOrAdminGuard)
   patchPost(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('postId', ParseIntPipe) id: number,
     @Body() body: UpdatePostDto,
     // @Body('title') title?: string,
     // @Body('content') content?: string,
