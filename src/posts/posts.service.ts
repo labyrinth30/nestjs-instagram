@@ -17,19 +17,20 @@ export class PostsService {
   constructor(
     @InjectRepository(PostsModel)
     private readonly postsRepository: Repository<PostsModel>,
-
     @InjectRepository(ImageModel)
     private readonly imageRepository: Repository<ImageModel>,
     private readonly commonService: CommonService,
     private readonly configService: ConfigService,
-  ) {}
-  async getAllPosts()  {
+  ) {
+  }
+
+  async getAllPosts() {
     return this.postsRepository.find({
       ...DEFAULT_POST_FIND_OPTIONS,
     });
   }
 
-  async getPostById(id: number, qr?:QueryRunner) {
+  async getPostById(id: number, qr?: QueryRunner) {
     const repository = this.getRepository(qr);
     const post = await repository.findOne({
       ...DEFAULT_POST_FIND_OPTIONS,
@@ -37,15 +38,15 @@ export class PostsService {
         id,
       }
     });
-    if(!post) {
+    if (!post) {
       throw new NotFoundException('게시물을 찾을 수 없습니다.');
     }
     return post;
   }
 
   // QueryRunner에 따라 다른 Repository를 반환한다.
-  getRepository(qr?: QueryRunner){
-    if(qr){
+  getRepository(qr?: QueryRunner) {
+    if (qr) {
       return qr.manager.getRepository<PostsModel>(PostsModel);
     }
     return this.postsRepository;
@@ -73,7 +74,7 @@ export class PostsService {
   async updatePost(
     postId: number,
     postDto: UpdatePostDto
-  ) : Promise<PostsModel>    {
+  ): Promise<PostsModel> {
     // save의 기능
     // 1) 만약에 데이터가 존재하지 않는다면(id 기준으로)
     // 2) 새로운 데이터를 생성한다.
@@ -89,10 +90,10 @@ export class PostsService {
       throw new NotFoundException('게시물을 찾을 수 없습니다.');
     }
 
-    if(title) {
+    if (title) {
       post.title = title;
     }
-    if(content) {
+    if (content) {
       post.content = content;
     }
     const newPost = await this.postsRepository.save(post);
@@ -101,20 +102,20 @@ export class PostsService {
 
   async deletePost(postId: number) {
     const post = await this.postsRepository.findOne({
-    where: {
-      id: postId,
+      where: {
+        id: postId,
+      }
+    });
+    if (!post) {
+      throw new NotFoundException('게시물을 찾을 수 없습니다.');
     }
-  });
-  if (!post) {
-    throw new NotFoundException('게시물을 찾을 수 없습니다.');
+
+    await this.postsRepository.delete(postId);
+
+    return postId;
   }
 
-  await this.postsRepository.delete(postId);
-
-  return postId;
-  }
-
-  async paginatePosts(dto: PaginatePostDto){
+  async paginatePosts(dto: PaginatePostDto) {
     // if(dto.page){
     //   return this.pagePaginatePosts(dto);
     // } else{
@@ -124,10 +125,11 @@ export class PostsService {
       {
         ...DEFAULT_POST_FIND_OPTIONS,
       },
-        'posts',
-      );
+      'posts',
+    );
   }
-  async pagePaginatePosts(dto: PaginatePostDto){
+
+  async pagePaginatePosts(dto: PaginatePostDto) {
     /**
      * data: Data[],
      * total: number,
@@ -140,23 +142,24 @@ export class PostsService {
       order: {
         createdAt: dto.order__createdAt,
 
-      }});
+      }
+    });
     return {
       data: posts,
       total: count,
     }
   }
 
-  async cursorPaginatePosts(dto: PaginatePostDto){
-    const where : FindOptionsWhere<PostsModel> = {};
-    if(dto.where__id__less_than){
+  async cursorPaginatePosts(dto: PaginatePostDto) {
+    const where: FindOptionsWhere<PostsModel> = {};
+    if (dto.where__id__less_than) {
       /**
        * {
        *   id: LessThan(dto.where__id_less_than)
        * }
        */
       where.id = LessThan(dto.where__id__less_than);
-    } else if(dto.where__id__more_than){
+    } else if (dto.where__id__more_than) {
       where.id = MoreThan(dto.where__id__more_than);
     }
 
@@ -185,33 +188,34 @@ export class PostsService {
     const PROTOCOL = this.configService.get<string>(ENV_PROTOCOL_KEY);
     const HOST = this.configService.get<string>(ENV_HOST_KEY);
 
-    const nextUrl = lastItem &&  new URL(`${PROTOCOL}://${HOST}/posts`);
+    const nextUrl = lastItem && new URL(`${PROTOCOL}://${HOST}/posts`);
 
-    if(nextUrl){{
-      /**
-       * dto의 키값들을 루핑하면서
-       * 키값에 해당되는 밸류가 존재하면
-       * param에 그대로 붙여넣는다.
-       *
-       * 단, where__id_more_than 값만 lastItemm의 마지막 값으로 넣어준다
-       */
-      for(const key of Object.keys(dto)){
-        if(dto[key]){
-          if(key !== 'where__id_more_than' && key !== 'where__id_less_than'){
-            nextUrl.searchParams.append(key, dto[key]);
+    if (nextUrl) {
+      {
+        /**
+         * dto의 키값들을 루핑하면서
+         * 키값에 해당되는 밸류가 존재하면
+         * param에 그대로 붙여넣는다.
+         *
+         * 단, where__id_more_than 값만 lastItemm의 마지막 값으로 넣어준다
+         */
+        for (const key of Object.keys(dto)) {
+          if (dto[key]) {
+            if (key !== 'where__id_more_than' && key !== 'where__id_less_than') {
+              nextUrl.searchParams.append(key, dto[key]);
+            }
           }
         }
-      }
-      let key = null;
+        let key = null;
 
-      if(dto.order__createdAt === 'ASC'){
-        key = 'where__id_more_than';
+        if (dto.order__createdAt === 'ASC') {
+          key = 'where__id_more_than';
+        } else {
+          key = 'where__id_less_than';
+        }
+        nextUrl.searchParams.append(key, lastItem.id.toString());
       }
-      else{
-        key = 'where__id_less_than';
-      }
-      nextUrl.searchParams.append(key, lastItem.id.toString());
-    }}
+    }
 
     return {
       data: posts,
@@ -223,8 +227,8 @@ export class PostsService {
     }
   }
 
-  async generatePosts(userId: number){
-    for (let i = 0; i< 100; i++){
+  async generatePosts(userId: number) {
+    for (let i = 0; i < 100; i++) {
       await this.createPost(userId, {
         title: `테스트 게시물 ${i}`,
         content: `테스트 게시물 ${i}의 내용`,
@@ -233,11 +237,24 @@ export class PostsService {
     }
   }
 
-  async checkPostExistsById(id: number){
+  async checkPostExistsById(id: number) {
     return this.postsRepository.exists({
       where: {
         id,
       }
     })
+  }
+
+  async isPostMine(userId: number, postId: number) : Promise<boolean> {
+    return this.postsRepository.exists({
+      relations: ['author'],
+        where: {
+          id: postId,
+          author: {
+            id: userId,
+          }
+        }
+      }
+    )
   }
 }

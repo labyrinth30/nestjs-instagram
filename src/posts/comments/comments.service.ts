@@ -100,4 +100,20 @@ export class CommentsService {
     await this.commentsRepository.delete(id);
     return id;
   }
+
+  async isCommentMine(
+    userId: number,
+    commentId: number,
+  ) : Promise<boolean>{
+    const result : boolean = await this.commentsRepository.exists({
+      where: {
+        id: commentId,
+        author: {
+          id: userId,
+        }
+      },
+      relations: ['author'],
+    })
+    return result;
+  }
 }

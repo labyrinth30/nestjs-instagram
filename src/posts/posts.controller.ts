@@ -27,6 +27,10 @@ import { LogInterceptor } from '../common/interceptor/log.interceptor';
 import { TransactionInterceptor } from '../common/interceptor/transaction.interceptor';
 import { QueryRunner } from '../common/decorator/query-runner.decorator';
 import { HttpExceptionFilter } from '../common/exception-filter/http.exception-filter';
+import { RolesEnum } from '../users/const/roles.const';
+import { Roles } from '../users/decorator/roles.decorator';
+import { IsPublic } from '../common/decorator/is-public.decorator';
+import { IsPostMineOrAdminGuard } from './guard/is-post-mine-or-admin.guard';
 
 
 @Controller('posts')
@@ -39,6 +43,7 @@ export class PostsController {
   // 1) GET /posts
   // 모든 게시물을 조회하는 API
   @Get()
+  @IsPublic()
   @UseFilters(HttpExceptionFilter)
   getPosts(
     @Query() query: PaginatePostDto,
@@ -48,7 +53,6 @@ export class PostsController {
 
 
   @Post('random')
-  @UseGuards(AccessTokenGuard)
   async postPostsRandom(@User() user: UsersModel){
     await this.postsService.generatePosts(user.id);
     return true;
@@ -58,6 +62,7 @@ export class PostsController {
   // 2) GET /posts/:id
   // 아이디에 해당되는 특정 게시물을 조회하는 API
   @Get(':id')
+  @IsPublic()
   getPost(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id: number) {
     return this.postsService.getPostById(id);
   }
@@ -79,7 +84,6 @@ export class PostsController {
   // commit -> 저장
   // rollback -> 원상복구
   @Post()
-  @UseGuards(AccessTokenGuard)
   @UseInterceptors(TransactionInterceptor)
   async postPosts(
     @User('id') userId: number,
@@ -103,9 +107,10 @@ export class PostsController {
 
   // 4) PATCH /posts/:id
   // 아이디에 해당되는 특정 게시물을 수정하는 API
-  @Patch(':id')
+  @Patch(':postId')
+  @UseGuards(IsPostMineOrAdminGuard)
   patchPost(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('postId', ParseIntPipe) id: number,
     @Body() body: UpdatePostDto,
     // @Body('title') title?: string,
     // @Body('content') content?: string,
@@ -116,6 +121,7 @@ export class PostsController {
   // 5) DELETE /posts/:id
   // 아이디에 해당되는 특정 게시물을 삭제하는 API
   @Delete(':id')
+  @Roles(RolesEnum.ADMIN)
   deletePost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.deletePost(id);
   }
