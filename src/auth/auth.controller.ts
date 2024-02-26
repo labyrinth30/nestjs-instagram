@@ -4,12 +4,14 @@ import { MaxLengthPipe, MinLengthPipe, PasswordPipe } from './pipe/password.pipe
 import { BasicTokenGuard } from './guard/basic-token.guard';
 import { AccessTokenGuard, RefreshTokenGuard } from './guard/bearer-token.guard';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { IsPublic } from '../common/decorator/is-public.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('token/access')
+  @IsPublic()
   @UseGuards(RefreshTokenGuard)
   postTokenAccess(
     @Headers('authorization') rawToken: string,
@@ -25,6 +27,7 @@ export class AuthController {
   }
 
   @Post('token/refresh')
+  @IsPublic()
   @UseGuards(RefreshTokenGuard)
   postTokenRefresh(
     @Headers('authorization') rawToken: string,
@@ -41,6 +44,7 @@ export class AuthController {
 
   // 로그인
   @Post('login/email')
+  @IsPublic()
   @UseGuards(BasicTokenGuard)
   postLoginEmail(
     @Headers('authorization') rawToken: string,
@@ -55,6 +59,7 @@ export class AuthController {
 
   // 회원가입
   @Post('register/email')
+  @IsPublic()
   postRegisterEmail(
     // 비밀번호가 8자 이하여야 할 때 유효성 검사를 하는 방법
     @Body() body: RegisterUserDto,

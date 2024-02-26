@@ -27,6 +27,9 @@ import { LogInterceptor } from '../common/interceptor/log.interceptor';
 import { TransactionInterceptor } from '../common/interceptor/transaction.interceptor';
 import { QueryRunner } from '../common/decorator/query-runner.decorator';
 import { HttpExceptionFilter } from '../common/exception-filter/http.exception-filter';
+import { RolesEnum } from '../users/const/roles.const';
+import { Roles } from '../users/decorator/roles.decorator';
+import { IsPublic } from '../common/decorator/is-public.decorator';
 
 
 @Controller('posts')
@@ -39,6 +42,7 @@ export class PostsController {
   // 1) GET /posts
   // 모든 게시물을 조회하는 API
   @Get()
+  @IsPublic()
   @UseFilters(HttpExceptionFilter)
   getPosts(
     @Query() query: PaginatePostDto,
@@ -58,6 +62,7 @@ export class PostsController {
   // 2) GET /posts/:id
   // 아이디에 해당되는 특정 게시물을 조회하는 API
   @Get(':id')
+  @IsPublic()
   getPost(@Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE})) id: number) {
     return this.postsService.getPostById(id);
   }
@@ -116,6 +121,7 @@ export class PostsController {
   // 5) DELETE /posts/:id
   // 아이디에 해당되는 특정 게시물을 삭제하는 API
   @Delete(':id')
+  @Roles(RolesEnum.ADMIN)
   deletePost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.deletePost(id);
   }
