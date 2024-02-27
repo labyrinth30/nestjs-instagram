@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersModel } from './entity/users.entity';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CreateProfileImageDto } from './image/dto/create-profile-image.dto';
 import { join } from 'path';
@@ -13,8 +13,15 @@ export class UsersService {
     @InjectRepository(UsersModel)
     private readonly usersRepository: Repository<UsersModel>,
     @InjectRepository(UserFollowersModel)
-    private readonly userFollwersRepository: Repository<UserFollowersModel>,
-  ) {
+    private readonly userFollowersRepository: Repository<UserFollowersModel>,
+  ) {}
+
+  getUsersRepository(qr?: QueryRunner){
+    return qr ? qr.manager.getRepository<UsersModel>(UsersModel) : this.usersRepository;
+  }
+
+  getUserFollowersRepository(qr?: QueryRunner){
+    return qr ? qr.manager.getRepository<UserFollowersModel>(UserFollowersModel) : this.userFollowersRepository;
   }
 
   async createUser(dto: CreateUserDto) {
@@ -62,13 +69,29 @@ export class UsersService {
     });
   }
 
-  async followUser(followerId: number, followeeId: number): Promise<boolean> {
+  async followUser(followerId: number, followeeId: number, qr?: QueryRunner): Promise<boolean> {
+    const userFollowersRepository = this.getUserFollowersRepository(qr);
+
     // 자기 자신을 팔로우하는 경우
     if(followerId === followeeId) {
       throw new BadRequestException('자기 자신을 팔로우할 수 없습니다.');
     }
+    // 이미 팔로우한 경우
+    const existing = await userFollowersRepository.findOne({
+      where: {
+        follower: {
+          id: followerId,
+        },
+        followee: {
+          id: followeeId,
+        }
+      }
+    });
+    if(existing){
+      throw new BadRequestException('이미 팔로우한 유저입니다.');
+    }
 
-    const result = await this.userFollwersRepository.save({
+  await userFollowersRepository.save({
       follower: {
         id: followerId,
       },
@@ -104,7 +127,7 @@ export class UsersService {
     if(!includeNotConfirmed){
       where['isConfirmed'] = true;
     }
-    const result = await this.userFollwersRepository.find({
+    const result = await this.userFollowersRepository.find({
       where,
       relations: {
         follower: true,
@@ -122,9 +145,11 @@ export class UsersService {
 
   async confirmFollow(
     followerId: number,
-    followeeId: number
+    followeeId: number,
+    qr?: QueryRunner,
   ){
-    const existing = await this.userFollwersRepository.findOne({
+    const userFollowersRepository = this.getUserFollowersRepository(qr);
+    const existing = await userFollowersRepository.findOne({
       where: {
         follower: {
           id: followerId,
@@ -141,7 +166,7 @@ export class UsersService {
     if(!existing){
       throw new BadRequestException('팔로우 요청이 존재하지 않습니다.');
     }
-    await this.userFollwersRepository.save({
+    await userFollowersRepository.save({
       ...existing,
       isConfirmed: true,
     });
@@ -151,8 +176,11 @@ export class UsersService {
   async deleteFollow(
     followerId: number,
     followeeId: number,
+    qr?: QueryRunner,
   ){
-    await this.userFollwersRepository.delete({
+    const userFollowersRepository = this.getUserFollowersRepository(qr);
+
+    await userFollowersRepository.delete({
       follower:{
         id: followerId,
       },
@@ -162,4 +190,34 @@ export class UsersService {
     });
     return true;
   }
+
+  async increaseFollowerCount(
+    userId: number,
+    fieldName: keyof Pick<UsersModel, 'followerCount'| 'followeeCount'>,
+    qr?: QueryRunner){
+    const usersRepository = this.getUsersRepository(qr);
+    await usersRepository.increment(
+      {
+        id: userId
+      },
+      fieldName,
+      1,
+    );
+  }
+
+  async decreaseFollowerCount(
+    userId: number,
+    fieldName: keyof Pick<UsersModel, 'followerCount'| 'followeeCount'>,
+    qr?: QueryRunner){
+    const usersRepository = this.getUsersRepository(qr);
+    await usersRepository.decrement(
+      {
+        id: userId
+      },
+      fieldName,
+      1
+    );
+  }
+
+
 }

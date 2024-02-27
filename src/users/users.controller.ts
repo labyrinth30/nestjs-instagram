@@ -15,6 +15,9 @@ import { Roles } from './decorator/roles.decorator';
 import { RolesEnum } from './const/roles.const';
 import { UsersModel } from './entity/users.entity';
 import { User } from './decorator/user.decorator';
+import { TransactionInterceptor } from '../common/interceptor/transaction.interceptor';
+import { QueryRunner as QR } from 'typeorm';
+import { QueryRunner } from 'src/common/decorator/query-runner.decorator';
 
 @Controller('users')
 @ApiTags('유저 API')
@@ -63,20 +66,29 @@ export class UsersController {
   }
 
   @Patch('follow/:id/confirm')
+  @UseInterceptors(TransactionInterceptor)
   async patchFollowConfirm(
     @User() user: UsersModel,
     @Param('id', ParseIntPipe) followerId: number,
+    @QueryRunner() qr: QR,
   ){
-    await this.usersService.confirmFollow(followerId, user.id);
+    await this.usersService.confirmFollow(followerId, user.id, qr);
+    await this.usersService.increaseFollowerCount(user.id,'followerCount' ,qr);
+    await this.usersService.increaseFollowerCount(followerId,'followeeCount' ,qr);
     return true;
   }
 
   @Delete('follow/:id')
+  @UseInterceptors(TransactionInterceptor)
   async deleteFollow(
     @User() user: UsersModel,
     @Param('id', ParseIntPipe) followeeId: number,
+    @QueryRunner() qr: QR,
   ){
-    await this.usersService.deleteFollow(user.id, followeeId);
+    await this.usersService.deleteFollow(user.id, followeeId, qr);
+    await this.usersService.decreaseFollowerCount(user.id, 'followerCount', qr);
+    await this.usersService.decreaseFollowerCount(followeeId,'followeeCount', qr);
+
     return true;
   }
 
