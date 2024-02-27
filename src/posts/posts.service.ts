@@ -257,4 +257,30 @@ export class PostsService {
       }
     )
   }
+
+  async incrementCommentCount(
+    postId: number,
+    qr? : QueryRunner,
+  ){
+    const repository = this.getRepository(qr);
+    await repository.increment({
+      id: postId,
+      },
+      'commentCount',
+      1,
+    )
+  }
+
+  async decrementCommentCount(
+    postId: number,
+    qr? : QueryRunner,
+  ){
+    const repository = this.getRepository(qr);
+    await repository.decrement({
+        id: postId,
+      },
+      'commentCount',
+      1,
+    )
+  }
 }
