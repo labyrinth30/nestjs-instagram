@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CommonService } from '../../common/common.service';
 import { CommentsModel } from './entity/comments.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { PaginateCommentsDto } from './dto/paginate-comments.dto';
 import { CreateCommentsDto } from './dto/create-comments.dto';
 import { UsersModel } from '../../users/entity/users.entity';
@@ -16,6 +16,13 @@ export class CommentsService {
     @InjectRepository(CommentsModel)
     private readonly commentsRepository: Repository<CommentsModel>,
   ) {}
+
+  getRepository(qr?: QueryRunner) {
+    if (qr) {
+      return qr.manager.getRepository<CommentsModel>(CommentsModel);
+    }
+    return this.commentsRepository;
+  }
 
   paginateComments(
     dto: PaginateCommentsDto,
@@ -55,8 +62,10 @@ export class CommentsService {
     dto: CreateCommentsDto,
     postId: number,
     author: UsersModel,
+    qr?: QueryRunner,
   ){
-    return this.commentsRepository.save({
+    const repository = this.getRepository(qr);
+    return repository.save({
       ...dto,
       post: {
         id: postId,
@@ -88,8 +97,10 @@ export class CommentsService {
 
   async deleteComment(
     id: number,
+    qr?: QueryRunner,
   ){
-    const comment = await this.commentsRepository.findOne({
+    const repository = this.getRepository(qr);
+    const comment = await repository.findOne({
       where:{
         id,
       }
@@ -97,7 +108,7 @@ export class CommentsService {
     if(!comment){
       throw new BadRequestException(`id: ${id}에 해당하는 Comment는 없습니다.`);
     }
-    await this.commentsRepository.delete(id);
+    await repository.delete(id);
     return id;
   }
 
