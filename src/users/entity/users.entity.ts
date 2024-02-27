@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { RolesEnum } from '../const/roles.const';
 import { PostsModel } from '../../posts/entity/posts.entity';
 import { BaseModel } from '../../common/entity/base.entity';
@@ -11,6 +11,7 @@ import { ImageModel } from '../../common/entity/image.entity';
 import { ChatsModel } from '../../chats/entity/chat.entity';
 import { MessagesModel } from '../../chats/messages/entity/messages.entity';
 import { CommentsModel } from '../../posts/comments/entity/comments.entity';
+import { UserFollowersModel } from './user-followers.entity';
 
 /**
  * id: number
@@ -117,11 +118,10 @@ export class UsersModel extends BaseModel{
   postComments: CommentsModel[];
 
   // 내가 팔로우하는 사람
-  @ManyToMany(() => UsersModel, (user) => user.followees)
-  @JoinTable()
-  followers: UsersModel[];
+  @OneToMany(() => UserFollowersModel, (ufm) => ufm.follower)
+  followers: UserFollowersModel[];
 
   // 나를 팔로우하는 사람
-  @ManyToMany(() => UsersModel, (user) => user.followers)
-  followees: UsersModel[];
+  @OneToMany(() => UserFollowersModel, (ufm) => ufm.followee)
+  followees: UserFollowersModel[];
 }
