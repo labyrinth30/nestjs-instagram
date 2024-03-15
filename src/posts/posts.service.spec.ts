@@ -15,4 +15,8 @@ describe('PostsService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('should be for', () => {
+    expect(2+2).toEqual(4);
+  })
 });

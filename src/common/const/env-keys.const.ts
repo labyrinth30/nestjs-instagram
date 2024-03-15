@@ -25,3 +25,9 @@ export const ENV_DB_PASSWORD_KEY = 'DB_PASSWORD';
 // 데이터베이스 이름 -> postgres
 export const ENV_DB_DATABASE_KEY = 'DB_DATABASE';
 
+// 데이터베이스 사용자 -> postgres
+export const ENV_POSTGRES_USER = 'POSTGRES_USER';
+
+export const ENV_POSTGRES_PASSWORD = 'POSTGRES_PASSWORD';
+
+export const ENV_POSTGRES_DB = 'POSTGRES_DB';
